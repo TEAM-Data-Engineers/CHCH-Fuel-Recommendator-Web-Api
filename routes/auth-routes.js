@@ -1,8 +1,8 @@
-import express from "express";
-import pool from "../config/db.js";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import { jwtTokens } from "../utils/jwt-helpers.js";
+const express = require("express");
+const pool = require("../config/db.js");
+const bcrypt = require("bcryptjs");
+const jwtTokens = require("../utils/jwt-helpers.js").jwtTokens;
+const jwt = require("jsonwebtoken");
 
 const router = express.Router();
 
@@ -59,4 +59,4 @@ router.delete("/refresh_token", (req, res) => {
     }
 });
 
-export default router;
+module.exports = router;

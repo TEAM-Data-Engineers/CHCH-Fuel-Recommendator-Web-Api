@@ -1,16 +1,14 @@
-import express, { json } from "express";
-import cors from "cors";
-import dotenv from "dotenv";
-import cookieParser from "cookie-parser";
-import { dirname, join } from "path";
-import { fileURLToPath } from "url";
-import usersRouter from "./routes/users-routes.js";
-import authRouter from "./routes/auth-routes.js";
-import gasStationRouter from "./routes/gas-station-routes.js";
+const express = require("express");
+const { json } = require("express");
+const cors = require("cors");
+const dotenv = require("dotenv");
+const cookieParser = require("cookie-parser");
+const path = require("path");
+const usersRouter = require("./routes/users-routes.js");
+const authRouter = require("./routes/auth-routes.js");
+const gasStationRouter = require("./routes/gas-station-routes.js");
 
 dotenv.config();
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 const PORT = process.env.PORT || 5002;
@@ -20,7 +18,7 @@ app.use(cors(corsOptions));
 app.use(json());
 app.use(cookieParser());
 
-app.use("/", express.static(join(__dirname, "public")));
+app.use("/", express.static(path.join(__dirname, "public")));
 app.use("/api/users", usersRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/gas-stations", gasStationRouter);

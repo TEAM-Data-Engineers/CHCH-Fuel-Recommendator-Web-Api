@@ -1,7 +1,7 @@
-import express from "express";
-import pool from "../config/db.js";
-import bcrypt from "bcrypt";
-import { authenticateToken } from "../middlewares/authorization.js";
+const express = require("express");
+const pool = require("../config/db.js");
+const bcrypt = require("bcryptjs");
+const { authenticateToken } = require("../middlewares/authorization.js");
 
 const router = express.Router();
 
@@ -38,4 +38,4 @@ router.delete("/", async (req, res) => {
     }
 });
 
-export default router;
+module.exports = router;
