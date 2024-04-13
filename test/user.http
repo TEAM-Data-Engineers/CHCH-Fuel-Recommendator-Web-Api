@@ -1,0 +1,28 @@
+### Create User
+POST http://localhost:5002/api/users
+Content-Type: application/json
+
+{
+    "username": "aemooooon",
+    "email": "aemooooon@gmail.com",
+    "password": "password"
+}
+
+### Login and issue access token and refresh token
+POST http://localhost:5002/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "aemooooon@gmail.com",
+    "password": "password"
+}
+
+### Get User needs access token, once access token is expired, use refresh token to get new access token
+GET http://localhost:5002/api/users
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImE3Y2E1ZWJjLTcxODYtNDMwOC1hZGExLTk4OTEzY2FhZGMxNiIsInVzZXJuYW1lIjoiYWVtb29vb29uIiwiZW1haWwiOiJhZW1vb29vb25AZ21haWwuY29tIiwiaWF0IjoxNzEyOTkzOTk5LCJleHAiOjE3MTMwMDExOTl9.nsqS_eJdxYQWTP6K6gnemMAX5jZ-R4uYT816aoN8_7U
+
+### request new access token using refresh token
+GET http://localhost:5002/api/auth/refresh_token
+
+### Delete refresh token when user logs out
+DELETE http://localhost:5002/api/auth/refresh_token

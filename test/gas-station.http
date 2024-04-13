@@ -1,0 +1,3 @@
+### Get gas stations
+GET http://localhost:5002/api/gas-stations
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImE3Y2E1ZWJjLTcxODYtNDMwOC1hZGExLTk4OTEzY2FhZGMxNiIsInVzZXJuYW1lIjoiYWVtb29vb29uIiwiZW1haWwiOiJhZW1vb29vb25AZ21haWwuY29tIiwiaWF0IjoxNzEyOTkzOTk5LCJleHAiOjE3MTMwMDExOTl9.nsqS_eJdxYQWTP6K6gnemMAX5jZ-R4uYT816aoN8_7U
