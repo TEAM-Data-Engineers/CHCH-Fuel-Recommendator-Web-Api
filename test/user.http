@@ -1,5 +1,5 @@
 ### Create User
-POST http://localhost:5002/api/users
+POST http://localhost:5002/api/v1/users
 Content-Type: application/json
 
 {
@@ -9,7 +9,7 @@ Content-Type: application/json
 }
 
 ### Login and issue access token and refresh token
-POST http://localhost:5002/api/auth/login
+POST http://localhost:5002/api/v1/auth/login
 Content-Type: application/json
 
 {
@@ -18,11 +18,15 @@ Content-Type: application/json
 }
 
 ### Get User needs access token, once access token is expired, use refresh token to get new access token
-GET http://localhost:5002/api/users
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImE3Y2E1ZWJjLTcxODYtNDMwOC1hZGExLTk4OTEzY2FhZGMxNiIsInVzZXJuYW1lIjoiYWVtb29vb29uIiwiZW1haWwiOiJhZW1vb29vb25AZ21haWwuY29tIiwiaWF0IjoxNzEzMDAyMDYwLCJleHAiOjE3MTMwMDkyNjB9.Y5mSivJDWbZvPdtk1_b37hWjsL9rB7l0Y-yH3FLxqr8
+GET http://localhost:5002/api/v1/users
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImE3Y2E1ZWJjLTcxODYtNDMwOC1hZGExLTk4OTEzY2FhZGMxNiIsInVzZXJuYW1lIjoiYWVtb29vb29uIiwiZW1haWwiOiJhZW1vb29vb25AZ21haWwuY29tIiwiaWF0IjoxNzEzMDExNDM3LCJleHAiOjE3MTMwMTg2Mzd9.XBapjBqkllett4ZNTQ_RBzKZzc51qtd9vGAHsGr_x3E
 
 ### request new access token using refresh token
-GET http://localhost:5002/api/auth/refresh_token
+GET http://localhost:5002/api/v1/auth/refresh_token
 
 ### Delete refresh token when user logs out
-DELETE http://localhost:5002/api/auth/refresh_token
+DELETE http://localhost:5002/api/v1/auth/refresh_token
+
+### request gas stations
+GET http://localhost:5002/api/v1/gas-stations
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImE3Y2E1ZWJjLTcxODYtNDMwOC1hZGExLTk4OTEzY2FhZGMxNiIsInVzZXJuYW1lIjoiYWVtb29vb29uIiwiZW1haWwiOiJhZW1vb29vb25AZ21haWwuY29tIiwiaWF0IjoxNzEzMDExNDM3LCJleHAiOjE3MTMwMTg2Mzd9.XBapjBqkllett4ZNTQ_RBzKZzc51qtd9vGAHsGr_x3E

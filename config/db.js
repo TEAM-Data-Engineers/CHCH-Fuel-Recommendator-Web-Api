@@ -4,8 +4,8 @@ const { Pool } = pg;
 let localPoolConfig = {
     user: "root",
     password: "password",
-    host: "aemon_local_postgres",
-    port: 5432,
+    host: "localhost",
+    port: 5433,
     database: "p_database",
 };
 

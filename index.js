@@ -19,9 +19,9 @@ app.use(json());
 app.use(cookieParser());
 
 app.use("/", express.static(path.join(__dirname, "public")));
-app.use("/api/users", usersRouter);
-app.use("/api/auth", authRouter);
-app.use("/api/gas-stations", gasStationRouter);
+app.use("/api/v1/users", usersRouter);
+app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/gas-stations", gasStationRouter);
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
