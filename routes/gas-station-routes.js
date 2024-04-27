@@ -4,7 +4,7 @@ const { authenticateToken } = require("../middlewares/authorization.js");
 
 const router = express.Router();
 
-router.get("/",authenticateToken, async (req, res) => {
+router.get("/", async (req, res) => {
     try {
         const gasStations = await pool.query("SELECT * FROM gas_station");
         res.json({ gasStations: gasStations.rows });
