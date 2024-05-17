@@ -42,9 +42,10 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5002;
-const corsOptions = { Credentials: true, origin: process.env.CLIENT_URL || "*" };
+// const corsOptions = { Credentials: true, origin: process.env.CLIENT_URL || "*" };
 
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
+app.use(cors());
 app.use(json());
 app.use(cookieParser());
 

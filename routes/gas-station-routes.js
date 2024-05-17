@@ -9,14 +9,15 @@ const EARTH_RADIUS = 6371; // 地球半径，单位：公里
 // Haversine公式计算距离
 const haversineDistance = (lat1, lon1, lat2, lon2) => {
     const toRadians = (degrees) => degrees * (Math.PI / 180);
-    
+
     const dLat = toRadians(lat2 - lat1);
     const dLon = toRadians(lon2 - lon1);
     const lat1Rad = toRadians(lat1);
     const lat2Rad = toRadians(lat2);
 
-    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-              Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1Rad) * Math.cos(lat2Rad);
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1Rad) * Math.cos(lat2Rad);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     const distance = EARTH_RADIUS * c;
 
@@ -35,18 +36,18 @@ router.get("/", async (req, res) => {
         const gasStations = await pool.query("SELECT * FROM gas_station");
 
         // 筛选出5000米范围内的加油站
-        const nearbyStations = gasStations.rows.filter(station => {
+        const nearbyStations = gasStations.rows.filter((station) => {
             const distance = haversineDistance(
                 parseFloat(latitude),
                 parseFloat(longitude),
                 parseFloat(station.latitude),
                 parseFloat(station.longitude)
             );
-            return distance <= 5; // 5000米 = 5公里
+            return distance <= 5;
         });
 
         // 获取这些加油站的油价信息
-        const locationIds = nearbyStations.map(station => station.location_id);
+        const locationIds = nearbyStations.map((station) => station.location_id);
         if (locationIds.length > 0) {
             const query = `
                 SELECT 
@@ -67,8 +68,10 @@ router.get("/", async (req, res) => {
                 JOIN gas_station AS g 
                 ON f.location_id = g.location_id 
                 WHERE g.location_id = ANY($1::text[])
+                AND f.date = CURRENT_DATE
                 GROUP BY g.location_id, g.brand_name, g.location_name, g.latitude, g.longitude, g.address_line1, g.city, g.state_province, g.postal_code, g.country
             `;
+
             const values = [locationIds];
             const prices = await pool.query(query, values);
 
