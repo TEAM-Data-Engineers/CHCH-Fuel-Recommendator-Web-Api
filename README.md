@@ -53,7 +53,7 @@ To run this project locally, follow these steps:
 
 The project directory is structured as follows:
 
-```
+```bash
 CHCH-Fuel-Recommendator-Web-Api/
 ├── config/
 │   └── db.js
