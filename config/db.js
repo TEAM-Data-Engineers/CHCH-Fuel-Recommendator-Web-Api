@@ -31,6 +31,16 @@ const clientConfig = process.env.DATABASE_URL
     ? { connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } }
     : localClientConfig;
 
+// Log the database connection details (excluding password for security)
+logger.info('Database connection details:', {
+    user: localClientConfig.user,
+    host: localClientConfig.host,
+    port: localClientConfig.port,
+    database: localClientConfig.database,
+    environment: process.env.NODE_ENV,
+    using_database_url: !!process.env.DATABASE_URL
+});
+
 async function connectToDatabase() {
     const client = new Client(clientConfig);
     try {
