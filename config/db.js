@@ -20,4 +20,13 @@ const poolConfig = process.env.DATABASE_URL
 
 const pool = new Pool(poolConfig);
 
+pool.connect((err, client, release) => {
+    if (err) {
+        console.error(`Failed to connect to the database: ${err.message}`);
+    } else {
+        console.log("Successfully connected to the database");
+        release();
+    }
+});
+
 module.exports = pool;
