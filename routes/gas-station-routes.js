@@ -25,6 +25,8 @@ const haversineDistance = (lat1, lon1, lat2, lon2) => {
 };
 
 router.get("/", async (req, res) => {
+    const client = await connectToDatabase();
+
     const { latitude, longitude } = req.query;
 
     if (!latitude || !longitude) {
@@ -33,7 +35,7 @@ router.get("/", async (req, res) => {
 
     try {
         // 获取所有加油站
-        const gasStations = await pool.query("SELECT * FROM gas_station");
+        const gasStations = await client.query("SELECT * FROM gas_station");
 
         // 筛选出5000米范围内的加油站
         const nearbyStations = gasStations.rows.filter((station) => {
@@ -73,7 +75,6 @@ router.get("/", async (req, res) => {
             `;
 
             const values = [locationIds];
-            const client = await connectToDatabase();
             const prices = await client.query(query, values);
 
             res.json({ gasStations: prices.rows });
