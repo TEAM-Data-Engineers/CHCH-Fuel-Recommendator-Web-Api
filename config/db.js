@@ -1,9 +1,22 @@
-const pg = require("pg");
-const { Pool } = pg;
+const { Pool } = require("pg");
 const dotenv = require("dotenv");
+const winston = require("winston");
 
 dotenv.config({
     path: process.env.NODE_ENV === "production" ? ".env.production.local" : ".env.development.local"
+});
+
+// Create a logger
+const logger = winston.createLogger({
+    level: "info",
+    format: winston.format.combine(
+        winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+        winston.format.printf(({ timestamp, level, message }) => `${timestamp} ${level}: ${message}`)
+    ),
+    transports: [
+        new winston.transports.Console(),
+        new winston.transports.File({ filename: "db_connection.log" })
+    ],
 });
 
 const localPoolConfig = {
@@ -20,13 +33,12 @@ const poolConfig = process.env.DATABASE_URL
 
 const pool = new Pool(poolConfig);
 
-pool.connect((err, client, release) => {
-    if (err) {
-        console.error(`Failed to connect to the database: ${err.message}`);
-    } else {
-        console.log("Successfully connected to the database");
-        release();
-    }
+pool.on('connect', () => {
+    logger.info('Connected to the database');
+});
+
+pool.on('error', (err) => {
+    logger.error('Failed to connect to the database:', err.message);
 });
 
 module.exports = pool;
