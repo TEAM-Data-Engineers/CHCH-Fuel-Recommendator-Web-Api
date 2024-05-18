@@ -1,4 +1,4 @@
-const { Pool } = require("pg");
+const { Client } = require("pg");
 const dotenv = require("dotenv");
 const winston = require("winston");
 
@@ -19,7 +19,7 @@ const logger = winston.createLogger({
     ],
 });
 
-const localPoolConfig = {
+const localClientConfig = {
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     host: process.env.DB_HOST,
@@ -27,18 +27,20 @@ const localPoolConfig = {
     database: process.env.DB_NAME,
 };
 
-const poolConfig = process.env.DATABASE_URL
+const clientConfig = process.env.DATABASE_URL
     ? { connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } }
-    : localPoolConfig;
+    : localClientConfig;
 
-const pool = new Pool(poolConfig);
+async function connectToDatabase() {
+    const client = new Client(clientConfig);
+    try {
+        await client.connect();
+        logger.info('Connected to the database');
+        return client;
+    } catch (err) {
+        logger.error('Failed to connect to the database:', err.message);
+        throw err;
+    }
+}
 
-pool.on('connect', () => {
-    logger.info('Connected to the database');
-});
-
-pool.on('error', (err) => {
-    logger.error('Failed to connect to the database:', err.message);
-});
-
-module.exports = pool;
+module.exports = connectToDatabase;

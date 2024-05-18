@@ -1,5 +1,5 @@
 const express = require("express");
-const pool = require("../config/db.js");
+const connectToDatabase = require('../config/db.js');
 const { authenticateToken } = require("../middlewares/authorization.js");
 
 const router = express.Router();
@@ -73,7 +73,8 @@ router.get("/", async (req, res) => {
             `;
 
             const values = [locationIds];
-            const prices = await pool.query(query, values);
+            const client = await connectToDatabase();
+            const prices = await client.query(query, values);
 
             res.json({ gasStations: prices.rows });
         } else {
