@@ -44,8 +44,6 @@ const options = {
 };
 const specs = swaggerJsdoc(options);
 
-dotenv.config();
-
 const app = express();
 const PORT = process.env.PORT || 5002;
 // const corsOptions = { Credentials: true, origin: process.env.CLIENT_URL || "*" };

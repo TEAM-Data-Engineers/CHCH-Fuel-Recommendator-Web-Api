@@ -2,14 +2,16 @@ const pg = require("pg");
 const { Pool } = pg;
 const dotenv = require("dotenv");
 
-dotenv.config();
+dotenv.config({
+    path: process.env.NODE_ENV === "production" ? ".env.production.local" : ".env.development.local"
+});
 
 const localPoolConfig = {
-    user: process.env.DB_USER || "root",
-    password: process.env.DB_PASSWORD || "password",
-    host: process.env.DB_HOST || "localhost",
-    port: process.env.DB_PORT || 5433,
-    database: process.env.DB_NAME || "p_database",
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    database: process.env.DB_NAME,
 };
 
 const poolConfig = process.env.DATABASE_URL
