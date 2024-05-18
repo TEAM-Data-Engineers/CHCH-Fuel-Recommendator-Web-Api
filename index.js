@@ -11,6 +11,12 @@ const bodyParser = require("body-parser");
 const swaggerJsdoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
 
+const envFile = process.env.NODE_ENV === "production" ? ".env.production.local" : ".env.development.local";
+dotenv.config({ path: path.resolve(__dirname, envFile) });
+
+console.log("Current environment:", process.env.NODE_ENV);
+console.log("Database Host:", process.env.DB_HOST);
+
 const options = {
     definition: {
         openapi: "3.1.0",
@@ -54,7 +60,7 @@ app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/gas-stations", gasStationRouter);
 
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs, {explorer: true}));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs, { explorer: true }));
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
