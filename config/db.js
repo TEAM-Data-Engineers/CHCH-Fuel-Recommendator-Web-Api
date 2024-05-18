@@ -24,10 +24,13 @@ const localClientConfig = {
     database: process.env.DB_NAME,
     dialect: "postgres",
     dialectOptions: {
-        ssl: {
-            require: true,
-            rejectUnauthorized: false, // 这将忽略证书验证
-        }
+        // The comment below is for connecting to a database with SSL enabled
+        // for example, deploy AWS EC2 to connect a RDS database.
+        // ssl: {
+        //     require: true,
+        //     rejectUnauthorized: false,
+        // }
+        ssl: false,
     },
 };
 
