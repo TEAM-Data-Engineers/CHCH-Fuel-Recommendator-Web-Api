@@ -48,7 +48,7 @@ async function connectToDatabase() {
         logger.info('Connected to the database');
         return client;
     } catch (err) {
-        logger.error('Failed to connect to the database:', err.message);
+        logger.error('Failed to connect to the database:', err);
         throw err;
     }
 }
