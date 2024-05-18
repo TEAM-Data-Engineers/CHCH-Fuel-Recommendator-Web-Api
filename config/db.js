@@ -24,7 +24,10 @@ const localClientConfig = {
     database: process.env.DB_NAME,
     dialect: "postgres",
     dialectOptions: {
-        ssl: false,
+        ssl: {
+            require: true,
+            rejectUnauthorized: false, // 这将忽略证书验证
+        }
     },
 };
 
