@@ -3,7 +3,7 @@ const { Pool } = pg;
 const dotenv = require("dotenv");
 
 dotenv.config({
-    path: process.env.NODE_ENV === "production" ? ".env.production.local" : ".env.development.local",
+    path: process.env.NODE_ENV === "production" ? ".env.production.local" : ".env.development.local"
 });
 
 const localPoolConfig = {
@@ -14,12 +14,9 @@ const localPoolConfig = {
     database: process.env.DB_NAME,
 };
 
-const poolConfig = {
-    connectionString: process.env.DATABASE_URL,
-    ssl: {
-        rejectUnauthorized: false,
-    },
-};
+const poolConfig = process.env.DATABASE_URL
+    ? { connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } }
+    : localPoolConfig;
 
 const pool = new Pool(poolConfig);
 
