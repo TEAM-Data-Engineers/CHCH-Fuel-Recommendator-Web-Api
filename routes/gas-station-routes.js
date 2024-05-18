@@ -2,6 +2,7 @@ const express = require("express");
 const connectToDatabase = require("../config/db.js");
 const { authenticateToken } = require("../middlewares/authorization.js");
 const winston = require("winston");
+const { Sequelize, DataTypes } = require('sequelize');
 
 // Create a logger
 const logger = winston.createLogger({
@@ -36,8 +37,53 @@ const haversineDistance = (lat1, lon1, lat2, lon2) => {
     return distance;
 };
 
+let sequelize;
+let GasStation;
+let FuelPrice;
+
+const initializeDatabase = async () => {
+    sequelize = await connectToDatabase();
+
+    // 定义 gas_station 和 fuel_price 模型
+    GasStation = sequelize.define('GasStation', {
+        location_id: {
+            type: DataTypes.STRING,
+            primaryKey: true
+        },
+        brand_name: DataTypes.STRING,
+        location_name: DataTypes.STRING,
+        latitude: DataTypes.FLOAT,
+        longitude: DataTypes.FLOAT,
+        address_line1: DataTypes.STRING,
+        city: DataTypes.STRING,
+        state_province: DataTypes.STRING,
+        postal_code: DataTypes.STRING,
+        country: DataTypes.STRING,
+    }, {
+        timestamps: false,
+        tableName: 'gas_station',
+    });
+
+    FuelPrice = sequelize.define('FuelPrice', {
+        location_id: {
+            type: DataTypes.STRING,
+            primaryKey: true
+        },
+        fuel_type: DataTypes.STRING,
+        price: DataTypes.FLOAT,
+        date: DataTypes.DATEONLY,
+    }, {
+        timestamps: false,
+        tableName: 'fuel_price',
+    });
+
+    // 设置模型关系
+    FuelPrice.belongsTo(GasStation, { foreignKey: 'location_id' });
+};
+
+initializeDatabase();
+
 router.get("/", async (req, res) => {
-    const client = await connectToDatabase();
     const { latitude, longitude } = req.query;
 
     if (!latitude || !longitude) {
@@ -47,10 +93,10 @@ router.get("/", async (req, res) => {
 
     try {
         // 获取所有加油站
-        const gasStations = await client.query("SELECT * FROM gas_station");
+        const gasStations = await GasStation.findAll();
 
         // 筛选出5000米范围内的加油站
-        const nearbyStations = gasStations.rows.filter((station) => {
+        const nearbyStations = gasStations.filter((station) => {
             const distance = haversineDistance(
                 parseFloat(latitude),
                 parseFloat(longitude),
@@ -63,34 +109,45 @@ router.get("/", async (req, res) => {
         // 获取这些加油站的油价信息
         const locationIds = nearbyStations.map((station) => station.location_id);
         if (locationIds.length > 0) {
-            const query = `
-                SELECT 
-                    g.location_id,
-                    g.brand_name,
-                    g.location_name,
-                    g.latitude,
-                    g.longitude,
-                    g.address_line1,
-                    g.city,
-                    g.state_province,
-                    g.postal_code,
-                    g.country,
-                    ARRAY_AGG(f.fuel_type) AS fuel_types,
-                    ARRAY_AGG(f.price) AS prices,
-                    ARRAY_AGG(f.date) AS dates
-                FROM fuel_price AS f 
-                JOIN gas_station AS g 
-                ON f.location_id = g.location_id 
-                WHERE g.location_id = ANY($1::text[])
-                AND f.date = CURRENT_DATE
-                GROUP BY g.location_id, g.brand_name, g.location_name, g.latitude, g.longitude, g.address_line1, g.city, g.state_province, g.postal_code, g.country
-            `;
+            const prices = await FuelPrice.findAll({
+                where: {
+                    location_id: locationIds,
+                    date: {
+                        [Sequelize.Op.eq]: Sequelize.literal('CURRENT_DATE') // 正确使用日期比较
+                    }
+                },
+                include: [GasStation],
+                attributes: [
+                    [sequelize.col('GasStation.location_id'), 'location_id'],
+                    [sequelize.col('GasStation.brand_name'), 'brand_name'],
+                    [sequelize.col('GasStation.location_name'), 'location_name'],
+                    [sequelize.col('GasStation.latitude'), 'latitude'],
+                    [sequelize.col('GasStation.longitude'), 'longitude'],
+                    [sequelize.col('GasStation.address_line1'), 'address_line1'],
+                    [sequelize.col('GasStation.city'), 'city'],
+                    [sequelize.col('GasStation.state_province'), 'state_province'],
+                    [sequelize.col('GasStation.postal_code'), 'postal_code'],
+                    [sequelize.col('GasStation.country'), 'country'],
+                    [sequelize.fn('ARRAY_AGG', sequelize.col('FuelPrice.fuel_type')), 'fuel_types'],
+                    [sequelize.fn('ARRAY_AGG', sequelize.col('FuelPrice.price')), 'prices'],
+                    [sequelize.fn('ARRAY_AGG', sequelize.col('FuelPrice.date')), 'dates'],
+                ],
+                group: [
+                    'GasStation.location_id',
+                    'GasStation.brand_name',
+                    'GasStation.location_name',
+                    'GasStation.latitude',
+                    'GasStation.longitude',
+                    'GasStation.address_line1',
+                    'GasStation.city',
+                    'GasStation.state_province',
+                    'GasStation.postal_code',
+                    'GasStation.country'
+                ],
+            });
 
-            const values = [locationIds];
-            const prices = await client.query(query, values);
-
-            logger.info(`Found ${prices.rows.length} gas stations within 5km`);
-            res.json({ gasStations: prices.rows });
+            logger.info(`Found ${prices.length} gas stations within 5km`);
+            res.json({ gasStations: prices });
         } else {
             logger.info("No gas stations found within 5km");
             res.json({ gasStations: [] });
@@ -98,8 +155,6 @@ router.get("/", async (req, res) => {
     } catch (error) {
         logger.error(`Error fetching gas stations: ${error.message}`);
         res.status(500).json({ message: error.message });
-    } finally {
-        client.end();
     }
 });
 
