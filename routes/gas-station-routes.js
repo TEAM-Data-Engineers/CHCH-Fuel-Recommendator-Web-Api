@@ -1,15 +1,27 @@
 const express = require("express");
-const connectToDatabase = require('../config/db.js');
+const connectToDatabase = require("../config/db.js");
 const { authenticateToken } = require("../middlewares/authorization.js");
+const winston = require("winston");
+
+// Create a logger
+const logger = winston.createLogger({
+    level: "info",
+    format: winston.format.combine(
+        winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+        winston.format.printf(({ timestamp, level, message }) => `${timestamp} ${level}: ${message}`)
+    ),
+    transports: [
+        new winston.transports.Console(),
+        new winston.transports.File({ filename: "gas_station_routes.log" })
+    ],
+});
 
 const router = express.Router();
-
 const EARTH_RADIUS = 6371; // 地球半径，单位：公里
 
 // Haversine公式计算距离
 const haversineDistance = (lat1, lon1, lat2, lon2) => {
     const toRadians = (degrees) => degrees * (Math.PI / 180);
-
     const dLat = toRadians(lat2 - lat1);
     const dLon = toRadians(lon2 - lon1);
     const lat1Rad = toRadians(lat1);
@@ -26,10 +38,10 @@ const haversineDistance = (lat1, lon1, lat2, lon2) => {
 
 router.get("/", async (req, res) => {
     const client = await connectToDatabase();
-
     const { latitude, longitude } = req.query;
 
     if (!latitude || !longitude) {
+        logger.error("Latitude and longitude are required");
         return res.status(400).json({ message: "Latitude and longitude are required" });
     }
 
@@ -77,12 +89,17 @@ router.get("/", async (req, res) => {
             const values = [locationIds];
             const prices = await client.query(query, values);
 
+            logger.info(`Found ${prices.rows.length} gas stations within 5km`);
             res.json({ gasStations: prices.rows });
         } else {
+            logger.info("No gas stations found within 5km");
             res.json({ gasStations: [] });
         }
     } catch (error) {
+        logger.error(`Error fetching gas stations: ${error.message}`);
         res.status(500).json({ message: error.message });
+    } finally {
+        client.end();
     }
 });
 

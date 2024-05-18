@@ -4,18 +4,29 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
 const path = require("path");
-const usersRouter = require("./routes/users-routes.js");
-const authRouter = require("./routes/auth-routes.js");
-const gasStationRouter = require("./routes/gas-station-routes.js");
-const bodyParser = require("body-parser");
 const swaggerJsdoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
+const winston = require("winston");
 
+// Load environment variables
 const envFile = process.env.NODE_ENV === "production" ? ".env.production.local" : ".env.development.local";
 dotenv.config({ path: path.resolve(__dirname, envFile) });
 
-console.log("Current environment:", process.env.NODE_ENV);
-console.log("Database Host:", process.env.DB_HOST);
+const usersRouter = require("./routes/users-routes.js");
+const authRouter = require("./routes/auth-routes.js");
+const gasStationRouter = require("./routes/gas-station-routes.js");
+
+const logger = winston.createLogger({
+    level: "info",
+    format: winston.format.combine(
+        winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+        winston.format.printf(({ timestamp, level, message }) => `${timestamp} ${level}: ${message}`)
+    ),
+    transports: [
+        new winston.transports.Console(),
+        new winston.transports.File({ filename: "server.log" })
+    ],
+});
 
 const options = {
     definition: {
@@ -46,9 +57,7 @@ const specs = swaggerJsdoc(options);
 
 const app = express();
 const PORT = process.env.PORT || 5002;
-// const corsOptions = { Credentials: true, origin: process.env.CLIENT_URL || "*" };
 
-// app.use(cors(corsOptions));
 app.use(cors());
 app.use(json());
 app.use(cookieParser());
@@ -61,5 +70,6 @@ app.use("/api/v1/gas-stations", gasStationRouter);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs, { explorer: true }));
 
 app.listen(PORT, () => {
+    logger.info(`Server is running on port ${PORT}`);
     console.log(`Server is running on port ${PORT}`);
 });
