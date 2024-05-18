@@ -42,6 +42,7 @@ logger.info('Database connection details:', {
 });
 
 async function connectToDatabase() {
+    console.log(localClientConfig)
     const client = new Client(clientConfig);
     try {
         await client.connect();
