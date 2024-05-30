@@ -1,17 +1,13 @@
 # CHCH-Fuel-Recommendator-Web-Api
 
-## Description
-
-The `CHCH-Fuel-Recommendator-Web-Api` is part of the CHCH-Fuel-Recommendator project by Group TEAM. This API provides backend services for managing user authentication, retrieving gas station information, and fuel prices. It is built using Node.js, Express, and PostgreSQL, and is documented using Swagger.
-
 ## Project Overview
 
-This project focuses on data engineering and involves the development of microservices for the frontend, backend, and mobile end. We use PostgreSQL and MongoDB databases to manage data. GitHub issues and projects are utilized for project management.
+The `CHCH-Fuel-Recommendator-Web-Api` is the Data472 course group project of TEAM, which is the second stage of exposure to the gas stations and daily fuel prices data from the Postgresql Database. This API provides backend services for managing user authentication and retrieving gas station information and fuel prices. It is built using Node.js, Express, and PostgreSQL and is documented using Swagger.
 
 ## Features
 
 - User authentication and authorization.
-- Retrieve gas station information based on user location.
+- Retrieve gas station information based on user location and ranging in 5KM.
 - Provide fuel prices for different gas stations.
 - API documentation using Swagger.
 
@@ -81,7 +77,7 @@ CHCH-Fuel-Recommendator-Web-Api/
 
 ### Gas Stations
 
-- `GET /api/v1/gas-stations`: Retrieve gas stations within a 5 km radius based on user's location.
+- `GET /api/v1/gas-stations`: Retrieve gas stations within a 5 km radius based on user's location.`
 
 ## Usage
 
